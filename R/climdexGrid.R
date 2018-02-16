@@ -33,7 +33,7 @@
 #' @importFrom transformeR getTimeResolution redim checkDim getShape getRefDates mat2Dto3Darray
 #'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid
 #' @importFrom parallel stopCluster
-#' @importFrom magrittr %>% %<>% extract2
+#' @importFrom magrittr %>% %<>%
 #' @importFrom PCICt as.PCICt
 #' @importFrom utils head
 #' @import climdex.pcic
