@@ -47,18 +47,24 @@
 #' @author J. Bedia
 #' @export
 
-climdexGrid <- function(tn = NULL,
+climdexGrid <- function(index.code,
+                        tn = NULL,
                         tx = NULL,
                         pr = NULL,
-                        index.code,
                         input.arg.list = list(),
                         index.arg.list = list(),
                         cal = "365_day",
                         parallel = FALSE,
                         max.ncores = 16,
                         ncores = NULL) {
-    if (any(sapply(list(tn, tx, pr), "getTimeResolution") != "DD")) {
-        stop("Daily data is required as input", call. = FALSE)
+    if (!is.null(tn)) {
+        if (getTimeResolution(tn) != "DD") stop("Daily data is required as input", call. = FALSE)
+    }
+    if (!is.null(tx)) {
+        if (getTimeResolution(tx) != "DD") stop("Daily data is required as input", call. = FALSE)
+    }
+    if (!is.null(pr)) {
+        if (getTimeResolution(pr) != "DD") stop("Daily data is required as input", call. = FALSE)
     }
     index.code <- match.arg(index.code,
                             choices = c("FD", "SU", "ID", "TR", "GSL", "TXx",
