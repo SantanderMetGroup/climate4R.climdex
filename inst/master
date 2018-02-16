@@ -1,0 +1,28 @@
+code;longname;indexfun;tn;tx;pr;units
+FD;Number_of_frost_days;climdex.fd;1;0;0;days
+SU;Number_of_summer_days;climdex.su;0;1;0;days
+ID;Number_of_icing_days;climdex.id;0;1;0;days
+TR;Number_of_tropical_nights;climdex.tr;1;0;0;days
+GSL;Growing_season_length;climdex.gsl;1;1;0;days
+TXx;Monthly_maximum_value_of_daily_maximum_temperature;climdex.txx;0;1;0;
+TNx;Monthly_maximum_value_of_daily_minimum_temperature;climdex.tnx;1;0;0;
+TXn;Monthly_minimum_value_of_daily_maximum_temperature;climdex.txn;0;1;0;
+TNn;Monthly_minimum_value_of_daily_minimum_temperature;climdex.tnn;1;0;0;
+TN10p;Percentage_of_days_when_TN<10th_percentile;climdex.tn10p;1;0;0;percentage
+TX10p;Percentage_of_days_when_TX<10th_percentile;climdex.tx10p;0;1;0;percentage
+TN90p;Percentage_of_days_when_TN>90th_percentile;climdex.tn90p;1;0;0;percentage
+TX90p;Percentage_of_days_when_TX>90th_percentile;climdex.tx90p;0;1;0;percentage
+WSDI;Warm_spell_duration index;climdex.wsdi;0;1;0;days
+CSDI;Cold_spell_duration_index;climdex.csdi;1;0;0;days
+DTR;Daily_temperature_range;climdex.dtr;1;1;0;
+Rx1day;Monthly_maximum_1-day_precipitation;climdex.rx1day;0;0;1;
+Rx5day;Monthly_maximum_consecutive_5-day_precipitation;climdex.rx5day;0;0;1;
+SDII;Simple_Precipitation_Intensity_Index;climdex.sdii;0;0;1;mm.day-1
+R10mm;Annual_count_of_days_when_PRCP>=10mm;climdex.r10mm;0;0;1;days
+R20mm;Annual_count_of_days_when_PRCP>=20mm;climdex.r20mm;0;0;1;days
+Rnnmm;Annual_count_of_days_when_PRCP>=nnmm;climdex.rnnmm;0;0;1;days
+CDD;Maximum_length_of_dry_spell (maximum_number_of_consecutive_days_with_RR<1mm);climdex.cdd;0;0;1;days
+CWD;Maximum_length_of_wet_spell (maximum_number_of_consecutive_days_with_RR≥1mm);climdex.cwd;0;0;1;days
+R95pTOT;Annual_total_PRCP_when_RR>95p;climdex.r95ptot;0;0;1;
+R99pTOT;Annual_total_PRCP_when_RR>99p;climdex.r99ptot;0;0;1;
+PRCPTOT;Annual_total_precipitation_in_wet_days;climdex.prcptot;0;0;1;

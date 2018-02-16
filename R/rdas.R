@@ -1,0 +1,62 @@
+#' @title Daily minimum temperature gridded data for the Iberian Peninsula (1991-2010)
+#' @format A climate4R grid
+#' @name tasmin.eobs
+#' @docType data
+#' @description Data from the EOBS dataset (v12), obtained via OPenDAP with \code{\link[loadeR]{loadGridData}}
+#' @references
+#' Haylock, M.R., Hofstra, N., Klein Tank, A.M.G., Klok, E.J., Jones, P.D., New, M., 2008. A European daily high-resolution gridded data set of surface temperature and precipitation for 1950–2006. Journal of Geophysical Research 113. https://doi.org/10.1029/2008JD010201
+#' @examples \dontrun{
+#' # This is how the data was obtained
+#' # (accessed 16 Feb 2018, target URL may change with newer dataset versions)
+#' require(loadeR)
+#' ds <- "http://opendap.knmi.nl/knmi/thredds/dodsC/e-obs_0.50regular/tn_0.50deg_reg_v16.0.nc"
+#' tasmin.eobs <- loadGridData(dataset = ds,
+#'                             var = "tn",
+#'                             lonLim = c(-10,4.5),
+#'                             latLim = c(35,44),
+#'                             season = 1:12,
+#'                             years = 1991:2010)
+#' }
+NULL
+
+#' @title Daily maximum temperature gridded data for the Iberian Peninsula (1991-2010)
+#' @format A climate4R grid
+#' @name tasmax.eobs
+#' @docType data
+#' @description Data from the EOBS dataset (v12), obtained via OPenDAP with \code{\link[loadeR]{loadGridData}}
+#' @references
+#' Haylock, M.R., Hofstra, N., Klein Tank, A.M.G., Klok, E.J., Jones, P.D., New, M., 2008. A European daily high-resolution gridded data set of surface temperature and precipitation for 1950–2006. Journal of Geophysical Research 113. https://doi.org/10.1029/2008JD010201
+#' @examples \dontrun{
+#' # This is how the data was obtained
+#' # (accessed 16 Feb 2018, target URL may change with newer dataset versions)
+#' require(loadeR)
+#' ds <- "http://opendap.knmi.nl/knmi/thredds/dodsC/e-obs_0.50regular/tx_0.50deg_reg_v16.0.nc"
+#' tasmin.eobs <- loadGridData(dataset = ds,
+#'                             var = "tx",
+#'                             lonLim = c(-10,4.5),
+#'                             latLim = c(35,44),
+#'                             season = 1:12,
+#'                             years = 1991:2010)
+#' }
+NULL
+
+#' @title Daily accumulated precipitation gridded data for the Iberian Peninsula (1991-2010)
+#' @format A climate4R grid
+#' @name pr.eobs
+#' @docType data
+#' @description Data from the EOBS dataset (v12), obtained via OPenDAP with \code{\link[loadeR]{loadGridData}}
+#' @references
+#' Haylock, M.R., Hofstra, N., Klein Tank, A.M.G., Klok, E.J., Jones, P.D., New, M., 2008. A European daily high-resolution gridded data set of surface temperature and precipitation for 1950–2006. Journal of Geophysical Research 113. https://doi.org/10.1029/2008JD010201
+#' @examples \dontrun{
+#' # This is how the data was obtained
+#' # (accessed 16 Feb 2018, target URL may change with newer dataset versions)
+#' require(loadeR)
+#' ds <- "http://opendap.knmi.nl/knmi/thredds/dodsC/e-obs_0.50regular/rr_0.50deg_reg_v16.0.nc"
+#' tasmin.eobs <- loadGridData(dataset = ds,
+#'                             var = "rr",
+#'                             lonLim = c(-10,4.5),
+#'                             latLim = c(35,44),
+#'                             season = 1:12,
+#'                             years = 1991:2010)
+#' }
+NULL
