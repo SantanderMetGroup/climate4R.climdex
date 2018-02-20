@@ -40,7 +40,11 @@
 #' @details \code{\link{climdexShow}} will display on screen a full list of ETCCDI Core indices and their codes. The names of the
 #' internal functions calculating each index is also displayed, whose help files can aid in the definition of index-specific arguments.
 #'
-#' \strong{Parallel computing}
+#' \strong{Baseline period}
+#' By default, the function will use as baseline period the full period of years encompassed by the input grid(s). This
+#' is used, for instance, for calculating the relevant percentiles in some indices etc. To use a specific baseline period
+#' use the \code{"base.range"} argument in the \code{input.arg.list} internally passed to
+#'  \code{\link[climdex.pcic]{climdexInput.raw}}.
 #'
 #' @template templateParallel
 #'
@@ -80,15 +84,15 @@ climdexGrid <- function(index.code,
     if (any(b - a > 0)) {
         stop("The required input variable(s) for ", index.code,
              " index calculation are missing\nType \'?",
-             metadata$indexfun, "\' for help",call. = FALSE)
+             metadata$indexfun, "\' for help", call. = FALSE)
     }
     # Remove any possible uneeded input grid
     if (any(a - b > 0)) {
         ind <- which((a - b) > 0)
         rem <- c("tn", "tx", "pr")[ind]
         sapply(rem, function(x) assign(x, NULL)) %>% invisible()
-        message("NOTE: some input grids provided are not required for ",
-                index.code, " calculation and were removed")
+        message("NOTE: some input grids provided for ", index.code,
+                " index calculation are not required and were removed")
     }
     # Ensure member is present data structures
     if (!is.null(tx)) tx %<>% redim(member = FALSE, var = FALSE)
@@ -175,7 +179,7 @@ climdexGrid <- function(index.code,
         attr(refGrid[["Variable"]], "annual_agg_cellfun") <- metadata$indexfun
     }
     refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
-    # Attributes
+    # Add attributes
     refGrid[["Variable"]][["varName"]] <- metadata$code
     attr(refGrid[["Variable"]], "longname") <- metadata$longname
     attr(refGrid[["Variable"]], "wasDefinedBy") <- "ETCCDI"

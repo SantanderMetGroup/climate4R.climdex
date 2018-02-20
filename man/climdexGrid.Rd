@@ -42,7 +42,11 @@ The function is a wrapper of the package \pkg{climdex.pcic} for its seamless int
 \code{\link{climdexShow}} will display on screen a full list of ETCCDI Core indices and their codes. The names of the
 internal functions calculating each index is also displayed, whose help files can aid in the definition of index-specific arguments.
 
-\strong{Parallel computing}
+\strong{Baseline period}
+By default, the function will use as baseline period the full period of years encompassed by the input grid(s). This
+is used, for instance, for calculating the relevant percentiles in some indices etc. To use a specific baseline period
+use the \code{"base.range"} argument in the \code{input.arg.list} internally passed to
+ \code{\link[climdex.pcic]{climdexInput.raw}}.
 }
 \section{Parallel Processing}{
 

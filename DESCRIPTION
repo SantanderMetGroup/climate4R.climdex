@@ -1,6 +1,6 @@
 Package: climate4R.climdex
 Title: Climate Change Index calculation for climate4R data
-Version: 0.0.0
+Version: 0.0.1
 Date: 2018-02-20
 Description: A climate4R wrapper of the climdex.pcic package implementing ETCCDI Climate Indices <http://etccdi.pacificclimate.org/list_27_indices.shtml>.
 Depends: R (>= 3.4.3),
