@@ -1,4 +1,4 @@
-#     climdexGrid.R ETCCDI Climate Changes Indices in Climate4R
+#     climdexGrid.R ETCCDI Core Indices in Climate4R
 #
 #     Copyright (C) 2018 Santander Meteorology Group (http://www.meteo.unican.es)
 #
@@ -78,23 +78,29 @@ climdexGrid <- function(index.code,
     a <- c(!is.null(tn), !is.null(tx), !is.null(pr)) %>% as.numeric()
     b <- metadata[ , 4:6] %>% as.numeric()
     if (any(b - a > 0)) {
-        stop("The required input variable(s) for ", index.code, " index calculation are missing\nType \'?", metadata$indexfun, "\' for help",call. = FALSE)
+        stop("The required input variable(s) for ", index.code,
+             " index calculation are missing\nType \'?",
+             metadata$indexfun, "\' for help",call. = FALSE)
     }
     # Remove any possible uneeded input grid
     if (any(a - b > 0)) {
         ind <- which((a - b) > 0)
         rem <- c("tn", "tx", "pr")[ind]
         sapply(rem, function(x) assign(x, NULL)) %>% invisible()
-        message("NOTE: some input grids provided are not required for ", index.code, " calculation and were removed")
+        message("NOTE: some input grids provided are not required for ",
+                index.code, " calculation and were removed")
     }
     # Ensure member is present data structures
     if (!is.null(tx)) tx %<>% redim(member = FALSE, var = FALSE)
     if (!is.null(tn)) tn %<>% redim(member = FALSE, var = FALSE)
     if (!is.null(pr)) pr %<>% redim(member = FALSE, var = FALSE)
     # Check structural consistency of data arrays when multiple
-    if (index.code == "DTR") sapply(list(tn, tx), "checkDim", dimensions = c("member", "time", "lat", "lon")) %>% invisible()
+    if (index.code == "DTR") sapply(list(tn, tx), "checkDim",
+                                    dimensions = c("member", "time", "lat", "lon")) %>% invisible()
     # name of the reference grid
-    refGridName <- c("tn","tx","pr")[which(c(!is.null(tn), !is.null(tx), !is.null(pr)) %>% as.numeric() != 0)] %>% head(1)
+    refGridName <- c("tn","tx","pr")[which(c(!is.null(tn),
+                                             !is.null(tx),
+                                             !is.null(pr)) %>% as.numeric() != 0)] %>% head(1)
     assign("refGrid", get(refGridName))
     # Number of members
     # n.mem <- getShape(refGrid, "member")
@@ -156,6 +162,7 @@ climdexGrid <- function(index.code,
         index.arg.list[["ci"]] <- ci
         do.call(metadata$indexfun, index.arg.list)
     })
+    tx <- tn <- pr <- NULL
     # Recover original matrix with masked points
     aux <- matrix(NA, nrow = nrow(out), ncol = nrow(coords))
     aux[ ,setdiff(1:ncol(aux), rm.ind)] <- out
@@ -170,8 +177,10 @@ climdexGrid <- function(index.code,
     refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
     # Attributes
     refGrid[["Variable"]][["varName"]] <- metadata$code
-    refGrid[["Variable"]][["varName"]] <- NULL
     attr(refGrid[["Variable"]], "longname") <- metadata$longname
+    attr(refGrid[["Variable"]], "wasDefinedBy") <- "ETCCDI"
+    attr(refGrid[["Variable"]], "hasMainURL") <- "http://etccdi.pacificclimate.org/list_27_indices.shtml"
+    attr(refGrid[["Variable"]], "description") <- metadata$description
     if (!is.na(metadata$units)) attr(refGrid[["Variable"]], "units") <- metadata$units
     message("[", Sys.time(), "] Done")
     invisible(refGrid)
