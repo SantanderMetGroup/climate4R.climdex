@@ -4,19 +4,19 @@
 \alias{climdexGrid}
 \title{ETCCDI Climate Changes Indices in Climate4R}
 \usage{
-climdexGrid(tn = NULL, tx = NULL, pr = NULL, index.code,
+climdexGrid(index.code, tn = NULL, tx = NULL, pr = NULL,
   input.arg.list = list(), index.arg.list = list(), cal = "365_day",
   parallel = FALSE, max.ncores = 16, ncores = NULL)
 }
 \arguments{
+\item{index.code}{Character string, indicating the specific code of the index according to the ETCCDI
+definitions (see Details).}
+
 \item{tn}{A climate4R grid of daily minimum temperature}
 
 \item{tx}{A climate4R grid of daily maximum temperature}
 
 \item{pr}{A climate4R grid of daily precipitation}
-
-\item{index.code}{Character string, indicating the specific code of the index according to the ETCCDI
-definitions (see Details).}
 
 \item{input.arg.list}{Optional. A list of arguments internally passed to \code{\link[climdex.pcic]{climdexInput.raw}}
 from package \pkg{climdex.pcic}}
