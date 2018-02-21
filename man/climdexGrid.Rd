@@ -65,6 +65,18 @@ particular case of large multimember datasets or large grids.
 Parallel computing is currently not available for Windows machines.
 }
 
+\examples{
+\dontrun{
+require(climate4R.climdex)
+require(visualizeR)
+data("tasmin.eobs")
+## FROST DAYS (Annual count of days when TN < 0 degC)
+fd.grid <- climdexGrid(tn = tasmin.eobs, index.code = "FD")
+spatialPlot(climatology(fd.grid), at = seq(0,165,10),
+            main = "Mean annual number of frost days (1991-2010)")
+}
+
+}
 \author{
 J. Bedia
 }
