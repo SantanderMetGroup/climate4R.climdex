@@ -33,7 +33,7 @@
 #' @importFrom transformeR getTimeResolution redim checkDim getShape getRefDates mat2Dto3Darray
 #'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid
 #' @importFrom parallel stopCluster
-#' @importFrom magrittr %>% %<>%
+#' @importFrom magrittr %>% %<>% extract2
 #' @importFrom PCICt as.PCICt
 #' @importFrom utils head
 #' @import climdex.pcic
@@ -104,10 +104,10 @@ climdexGrid <- function(index.code,
         message("NOTE: some input grids provided for ", index.code,
                 " index calculation are not required and were removed")
     }
-    # Ensure member is present data structures
-    if (!is.null(tx)) tx %<>% redim(member = FALSE, var = FALSE)
-    if (!is.null(tn)) tn %<>% redim(member = FALSE, var = FALSE)
-    if (!is.null(pr)) pr %<>% redim(member = FALSE, var = FALSE)
+    # Ensure member is present in data structures
+    if (!is.null(tx)) tx %<>% redim(member = TRUE, var = FALSE)
+    if (!is.null(tn)) tn %<>% redim(member = TRUE, var = FALSE)
+    if (!is.null(pr)) pr %<>% redim(member = TRUE, var = FALSE)
     # Check structural consistency of data arrays when multiple
     if (index.code == "DTR") sapply(list(tn, tx), "checkDim",
                                     dimensions = c("member", "time", "lat", "lon")) %>% invisible()
@@ -117,7 +117,7 @@ climdexGrid <- function(index.code,
                                              !is.null(pr)) %>% as.numeric() != 0)] %>% head(1)
     assign("refGrid", get(refGridName))
     # Number of members
-    # n.mem <- getShape(refGrid, "member")
+    n.mem <- getShape(refGrid, "member")
     coords <- expand.grid(refGrid$xyCoords$y, refGrid$xyCoords$x)[2:1]
     # coercion to PCICt
     refDates <- getRefDates(refGrid) %>% as.PCICt(cal = cal)
@@ -127,78 +127,99 @@ climdexGrid <- function(index.code,
     if (!is.null(pr)) refDates.pr <- refDates
     refDates <- NULL
     message("[", Sys.time(), "] Calculating ", index.code, " ...")
-    # skip masked grid points
-    rm.ind.tx <- rm.ind.tn <- rm.ind.pr <- c()
-    aux.tx <- aux.tn <- aux.pr <- NULL
-    if (!is.null(tx)) {
-        aux.tx <- tx[["Data"]] %>% array3Dto2Dmat()
-        rm.ind.tx <- which(apply(aux.tx, MARGIN = 2, FUN = function(x) all(is.na(x))))
+    if (n.mem > 1) {
+        parallel.pars <- parallelCheck(parallel, max.ncores, ncores)
+        apply_fun <- selectPar.pplyFun(parallel.pars, .pplyFUN = "lapply")
+        if (parallel.pars$hasparallel) on.exit(parallel::stopCluster(parallel.pars$cl))
+    } else {
+        if (isTRUE(parallel)) message("NOTE: Parallel processing was skipped (unable to parallelize one single member)")
+        apply_fun <- lapply
     }
-    if (!is.null(tn)) {
-        aux.tn <- tn[["Data"]] %>% array3Dto2Dmat()
-        rm.ind.tn <- which(apply(aux.tn, MARGIN = 2, FUN = function(x) all(is.na(x))))
-    }
-    if (!is.null(pr)) {
-        aux.pr <- pr[["Data"]] %>% array3Dto2Dmat()
-        rm.ind.pr <- which(apply(aux.pr, MARGIN = 2, FUN = function(x) all(is.na(x))))
-    }
-    # Remove missing values
-    rm.ind <- Reduce(union, list(rm.ind.tx, rm.ind.tn, rm.ind.pr))
-    if (length(rm.ind) > 0) {
+    out.list <- apply_fun(1:n.mem, function(x) {
+        # if (n.mem > 1) message("[", Sys.time(), "] Calculating ",
+                               # index.code, " for member ", x, " ...")
+        rm.ind.tx <- rm.ind.tn <- rm.ind.pr <- c()
+        aux.tx <- aux.tn <- aux.pr <- NULL
         if (!is.null(tx)) {
-            aux.tx <- aux.tx[, -rm.ind, drop = FALSE]
+            tmp <- subsetGrid(tx, members = x, drop = TRUE)
+            aux.tx <- tmp[["Data"]] %>% array3Dto2Dmat()
+            tmp <- NULL
+            rm.ind.tx <- which(apply(aux.tx, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(tn)) {
-            aux.tn <- aux.tn[, -rm.ind, drop = FALSE]
+            tmp <- subsetGrid(tn, members = x, drop = TRUE)
+            aux.tn <- tmp[["Data"]] %>% array3Dto2Dmat()
+            tmp <- NULL
+            rm.ind.tn <- which(apply(aux.tn, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(pr)) {
-            aux.pr <- aux.pr[, -rm.ind, drop = FALSE]
+            tmp <- subsetGrid(pr, members = x, drop = TRUE)
+            aux.pr <- tmp[["Data"]] %>% array3Dto2Dmat()
+            tmp <- NULL
+            rm.ind.pr <- which(apply(aux.pr, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
-    }
-    nvalid.points <- nrow(coords) - length(rm.ind)
-    valid.coords <- coords[-rm.ind, ]
-    parallel.pars <- parallelCheck(parallel, max.ncores, ncores)
-    apply_fun <- selectPar.pplyFun(parallel.pars, .pplyFUN = "sapply")
-    if (parallel.pars$hasparallel) on.exit(parallel::stopCluster(parallel.pars$cl))
-    out <- apply_fun(1:nvalid.points, function(i) {
-        input.arg.list[["northern.hemisphere"]] <- ifelse(valid.coords[i,2] >= 0, TRUE, FALSE)
-        input.arg.list[["tmax"]] <- aux.tx[ , i]
-        input.arg.list[["tmin"]] <- aux.tn[ , i]
-        input.arg.list[["prec"]] <- aux.pr[ , i]
-        input.arg.list[["tmax.dates"]] <- refDates.tx
-        input.arg.list[["tmin.dates"]] <- refDates.tn
-        input.arg.list[["prec.dates"]] <- refDates.pr
-        # Define available temporal range as baseline by default
-        if (!"base.range" %in% names(input.arg.list)) {
-            input.arg.list[["base.range"]] <- getYearsAsINDEX(refGrid) %>% range() %>% as.integer()
+        # Remove missing values
+        rm.ind <- Reduce(union, list(rm.ind.tx, rm.ind.tn, rm.ind.pr))
+        if (length(rm.ind) > 0) {
+            if (!is.null(tx)) {
+                aux.tx <- aux.tx[, -rm.ind, drop = FALSE]
+            }
+            if (!is.null(tn)) {
+                aux.tn <- aux.tn[, -rm.ind, drop = FALSE]
+            }
+            if (!is.null(pr)) {
+                aux.pr <- aux.pr[, -rm.ind, drop = FALSE]
+            }
         }
-        ci <- do.call("climdexInput.raw", input.arg.list)
-        index.arg.list[["ci"]] <- ci
-        do.call(metadata$indexfun, index.arg.list)
+        nvalid.points <- nrow(coords) - length(rm.ind)
+        valid.coords <- coords[-rm.ind, ]
+
+        out <- sapply(1:nvalid.points, function(i) {
+            input.arg.list[["northern.hemisphere"]] <- ifelse(valid.coords[i,2] >= 0, TRUE, FALSE)
+            input.arg.list[["tmax"]] <- aux.tx[ , i]
+            input.arg.list[["tmin"]] <- aux.tn[ , i]
+            input.arg.list[["prec"]] <- aux.pr[ , i]
+            input.arg.list[["tmax.dates"]] <- refDates.tx
+            input.arg.list[["tmin.dates"]] <- refDates.tn
+            input.arg.list[["prec.dates"]] <- refDates.pr
+            # Define available temporal range as baseline by default
+            if (!"base.range" %in% names(input.arg.list)) {
+                input.arg.list[["base.range"]] <- getYearsAsINDEX(refGrid) %>% range() %>% as.integer()
+            }
+            ci <- do.call("climdexInput.raw", input.arg.list)
+            index.arg.list[["ci"]] <- ci
+            do.call(metadata$indexfun, index.arg.list)
+        })
+        tx <- tn <- pr <- NULL
+        # Recover original matrix with masked points
+        aux <- matrix(NA, nrow = nrow(out), ncol = nrow(coords))
+        aux[ ,setdiff(1:ncol(aux), rm.ind)] <- out
+        out <- NULL
+        # Transform to climate4R grid
+        refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.m = list(FUN = "mean")))
+        attr(refGrid[["Variable"]], "monthly_agg_cellfun") <- metadata$indexfun
+        if (nrow(aux) == getYearsAsINDEX(refGrid) %>% unique() %>% length()) {
+            refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.y = list(FUN = "mean")))
+            attr(refGrid[["Variable"]], "annual_agg_cellfun") <- metadata$indexfun
+        }
+        refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
+        # Add attributes
+        refGrid[["Variable"]][["varName"]] <- metadata$code
+        attr(refGrid[["Variable"]], "longname") <- metadata$longname
+        attr(refGrid[["Variable"]], "wasDefinedBy") <- "ETCCDI"
+        attr(refGrid[["Variable"]], "hasMainURL") <- "http://etccdi.pacificclimate.org/list_27_indices.shtml"
+        attr(refGrid[["Variable"]], "description") <- metadata$description
+        if (!is.na(metadata$units)) attr(refGrid[["Variable"]], "units") <- metadata$units
+        return(refGrid)
     })
-    tx <- tn <- pr <- NULL
-    # Recover original matrix with masked points
-    aux <- matrix(NA, nrow = nrow(out), ncol = nrow(coords))
-    aux[ ,setdiff(1:ncol(aux), rm.ind)] <- out
-    out <- NULL
-    # Transform to climate4R grid
-    refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.m = list(FUN = "mean")))
-    attr(refGrid[["Variable"]], "monthly_agg_cellfun") <- metadata$indexfun
-    if (nrow(aux) == getYearsAsINDEX(refGrid) %>% unique() %>% length()) {
-        refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.y = list(FUN = "mean")))
-        attr(refGrid[["Variable"]], "annual_agg_cellfun") <- metadata$indexfun
-    }
-    refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
-    # Add attributes
-    refGrid[["Variable"]][["varName"]] <- metadata$code
-    attr(refGrid[["Variable"]], "longname") <- metadata$longname
-    attr(refGrid[["Variable"]], "wasDefinedBy") <- "ETCCDI"
-    attr(refGrid[["Variable"]], "hasMainURL") <- "http://etccdi.pacificclimate.org/list_27_indices.shtml"
-    attr(refGrid[["Variable"]], "description") <- metadata$description
-    if (!is.na(metadata$units)) attr(refGrid[["Variable"]], "units") <- metadata$units
     message("[", Sys.time(), "] Done")
-    invisible(refGrid)
+    if (length(out.list) == 1) {
+        out.list %>% extract2(1) %>% redim(drop = TRUE) %>% invisible()
+    } else {
+        do.call("bindGrid.member", out.list) %>% invisible()
+    }
 }
+
 
 
 
@@ -221,7 +242,7 @@ climdexGrid <- function(index.code,
 #' @importFrom magrittr %>%
 
 climdexShow <- function() {
-     read.master() %>% print()
+    read.master() %>% print()
 }
 
 

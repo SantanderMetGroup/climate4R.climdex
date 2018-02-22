@@ -7,3 +7,8 @@
  * Add examples section in `climdexGrid`
  * Add README file
  * Other minor changes in on-screen messages
+
+## v0.1.0
+ * Support for multimember grids
+ * Replaced parallelization along space by members
+ * Other minor changes in on-screen messages
