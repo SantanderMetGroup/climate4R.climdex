@@ -12,11 +12,11 @@ climdexGrid(index.code, tn = NULL, tx = NULL, pr = NULL,
 \item{index.code}{Character string, indicating the specific code of the index according to the ETCCDI
 definitions (see Details).}
 
-\item{tn}{A climate4R grid of daily minimum temperature}
+\item{tn}{A climate4R grid of daily minimum temperature (degrees C)}
 
-\item{tx}{A climate4R grid of daily maximum temperature}
+\item{tx}{A climate4R grid of daily maximum temperature (degrees C)}
 
-\item{pr}{A climate4R grid of daily precipitation}
+\item{pr}{A climate4R grid of daily precipitation (mm)}
 
 \item{input.arg.list}{Optional. A list of arguments internally passed to \code{\link[climdex.pcic]{climdexInput.raw}}
 from package \pkg{climdex.pcic}}

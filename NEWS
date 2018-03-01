@@ -12,3 +12,6 @@
  * Support for multimember grids
  * Replaced parallelization along space by members
  * Other minor changes in on-screen messages
+
+## v0.1.1
+ * Bug fix in the retrieval of metadata for ensemble members
