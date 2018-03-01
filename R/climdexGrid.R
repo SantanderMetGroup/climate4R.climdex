@@ -18,9 +18,9 @@
 #' @title ETCCDI Climate Changes Indices in Climate4R
 #' @description Calculation of the 27 core indices of the Expert Team on Climate Change Detection and Indices (ETCCDI).
 #' The function is a wrapper of the package \pkg{climdex.pcic} for its seamless integration with climate4R objects.
-#' @param tn A climate4R grid of daily minimum temperature
-#' @param tx A climate4R grid of daily maximum temperature
-#' @param pr A climate4R grid of daily precipitation
+#' @param tn A climate4R grid of daily minimum temperature (degrees C)
+#' @param tx A climate4R grid of daily maximum temperature (degrees C)
+#' @param pr A climate4R grid of daily precipitation (mm)
 #' @param cal A calendar definition. Default to 365-day calendar. This argument is passed to \code{\link[PCICt]{as.PCICt}},
 #' whose help documentation contains further details.
 #' @param index.code Character string, indicating the specific code of the index according to the ETCCDI
