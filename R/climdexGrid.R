@@ -143,23 +143,21 @@ climdexGrid <- function(index.code,
         if (!is.null(tx)) {
             tmp <- subsetGrid(tx, members = x, drop = TRUE)
             aux.tx <- tmp[["Data"]] %>% array3Dto2Dmat()
-            tmp <- NULL
             rm.ind.tx <- which(apply(aux.tx, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(tn)) {
             tmp <- subsetGrid(tn, members = x, drop = TRUE)
             aux.tn <- tmp[["Data"]] %>% array3Dto2Dmat()
-            tmp <- NULL
             rm.ind.tn <- which(apply(aux.tn, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(pr)) {
             tmp <- subsetGrid(pr, members = x, drop = TRUE)
             aux.pr <- tmp[["Data"]] %>% array3Dto2Dmat()
-            tmp <- NULL
             rm.ind.pr <- which(apply(aux.pr, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         # Remove missing values
         rm.ind <- Reduce(union, list(rm.ind.tx, rm.ind.tn, rm.ind.pr))
+        valid.coords <- coords
         if (length(rm.ind) > 0) {
             if (!is.null(tx)) {
                 aux.tx <- aux.tx[, -rm.ind, drop = FALSE]
@@ -170,10 +168,9 @@ climdexGrid <- function(index.code,
             if (!is.null(pr)) {
                 aux.pr <- aux.pr[, -rm.ind, drop = FALSE]
             }
+            valid.coords <- coords[-rm.ind, ]
         }
-        nvalid.points <- nrow(coords) - length(rm.ind)
-        valid.coords <- coords[-rm.ind, ]
-
+        nvalid.points <- nrow(valid.coords)
         out <- sapply(1:nvalid.points, function(i) {
             input.arg.list[["northern.hemisphere"]] <- ifelse(valid.coords[i,2] >= 0, TRUE, FALSE)
             input.arg.list[["tmax"]] <- aux.tx[ , i]
@@ -196,7 +193,8 @@ climdexGrid <- function(index.code,
         aux[ ,setdiff(1:ncol(aux), rm.ind)] <- out
         out <- NULL
         # Transform to climate4R grid
-        refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.m = list(FUN = "mean")))
+        refGrid <- suppressMessages(aggregateGrid(tmp, aggr.m = list(FUN = "mean")))
+        tmp <- NULL
         attr(refGrid[["Variable"]], "monthly_agg_cellfun") <- metadata$indexfun
         if (nrow(aux) == getYearsAsINDEX(refGrid) %>% unique() %>% length()) {
             refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.y = list(FUN = "mean")))
