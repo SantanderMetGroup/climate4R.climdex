@@ -109,8 +109,9 @@ climdexGrid <- function(index.code,
     if (!is.null(tn)) tn %<>% redim(member = TRUE, var = FALSE)
     if (!is.null(pr)) pr %<>% redim(member = TRUE, var = FALSE)
     # Check structural consistency of data arrays when multiple
-    if (index.code == "DTR") sapply(list(tn, tx), "checkDim",
-                                    dimensions = c("member", "time", "lat", "lon")) %>% invisible()
+    if (index.code == "DTR" | index.code == "GSL") {
+        sapply(list(tn, tx), "checkDim", dimensions = c("member", "time", "lat", "lon")) %>% invisible()
+    }
     # name of the reference grid
     refGridName <- c("tn","tx","pr")[which(c(!is.null(tn),
                                              !is.null(tx),

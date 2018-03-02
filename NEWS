@@ -15,3 +15,6 @@
 
 ## v0.1.1
  * Bug fix in the retrieval of metadata for ensemble members
+
+## v0.1.2
+ * Minor bug fix to include dimensional consistency check for input grids of multivariable index GSL
