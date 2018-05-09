@@ -31,7 +31,7 @@
 #'  for the target index. See Details.
 #' @template templateParallelParams
 #' @importFrom transformeR getTimeResolution redim checkDim getShape getRefDates mat2Dto3Darray
-#'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid
+#'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid bindGrid.member
 #' @importFrom parallel stopCluster
 #' @importFrom magrittr %>% %<>% extract2
 #' @importFrom PCICt as.PCICt
