@@ -31,7 +31,7 @@
 #'  for the target index. See Details.
 #' @template templateParallelParams
 #' @importFrom transformeR getTimeResolution redim checkDim getShape getRefDates mat2Dto3Darray
-#'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid bindGrid.member
+#'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid bindGrid
 #' @importFrom parallel stopCluster
 #' @importFrom magrittr %>% %<>% extract2
 #' @importFrom PCICt as.PCICt
@@ -215,7 +215,7 @@ climdexGrid <- function(index.code,
     if (length(out.list) == 1) {
         out.list %>% extract2(1) %>% redim(drop = TRUE) %>% invisible()
     } else {
-        do.call("bindGrid.member", out.list) %>% invisible()
+        do.call("bindGrid", c(out.list, dimension = "member")) %>% invisible()
     }
 }
 

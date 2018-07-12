@@ -1,23 +1,26 @@
 # NEWS
 
-## v0.0.0
+## v0.0.0 (20 Feb 2018)
  * Package release
 
-## v0.0.1
+## v0.0.1 (21 Feb 2018)
  * Add examples section in `climdexGrid`
  * Add README file
  * Other minor changes in on-screen messages
 
-## v0.1.0
+## v0.1.0 (23 Feb 2018)
  * Support for multimember grids
  * Replaced parallelization along space by members
  * Other minor changes in on-screen messages
 
-## v0.1.1
+## v0.1.1 (2 Mar 2018)
  * Bug fix in the retrieval of metadata for ensemble members
 
-## v0.1.2
+## v0.1.2 (2 Mar 2018)
  * Minor bug fix to include dimensional consistency check for input grids of multivariable index GSL
 
-## v0.1.3
+## v0.1.3 (9 May 2018)
  * Fix a missing import for `transformeR::bindGrid.member`
+
+## v0.1.4 (in devel)
+* Replace calls to `bindGrid.*` internals by `bindGrid` with appropriate arguments
