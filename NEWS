@@ -22,5 +22,5 @@
 ## v0.1.3 (9 May 2018)
  * Fix a missing import for `transformeR::bindGrid.member`
 
-## v0.1.4 (in devel)
+## v0.1.4 (15 Aug 2018)
 * Replace calls to `bindGrid.*` internals by `bindGrid` with appropriate arguments
