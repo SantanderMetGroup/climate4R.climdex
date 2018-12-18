@@ -24,3 +24,7 @@
 
 ## v0.1.4 (15 Aug 2018)
 * Replace calls to `bindGrid.*` internals by `bindGrid` with appropriate arguments
+
+## v0.2.0 (18 Dec 2018)
+* Support for station data, with an example
+* Doc update and a few typos fixed
