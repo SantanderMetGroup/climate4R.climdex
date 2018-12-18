@@ -18,9 +18,9 @@
 #' @title ETCCDI Climate Changes Indices in Climate4R
 #' @description Calculation of the 27 core indices of the Expert Team on Climate Change Detection and Indices (ETCCDI).
 #' The function is a wrapper of the package \pkg{climdex.pcic} for its seamless integration with climate4R objects.
-#' @param tn A climate4R grid of daily minimum temperature (degrees C)
-#' @param tx A climate4R grid of daily maximum temperature (degrees C)
-#' @param pr A climate4R grid of daily precipitation (mm)
+#' @param tn A climate4R dataset of daily minimum temperature (degrees C)
+#' @param tx A climate4R dataset of daily maximum temperature (degrees C)
+#' @param pr A climate4R dataset of daily precipitation (mm)
 #' @param cal A calendar definition. Default to 365-day calendar. This argument is passed to \code{\link[PCICt]{as.PCICt}},
 #' whose help documentation contains further details.
 #' @param index.code Character string, indicating the specific code of the index according to the ETCCDI
@@ -30,8 +30,7 @@
 #' @param index.arg.list Optional (but depending on the specific index might be necessary). A list of specific arguments
 #'  for the target index. See Details.
 #' @template templateParallelParams
-#' @importFrom transformeR getTimeResolution redim checkDim getShape getRefDates mat2Dto3Darray
-#'  array3Dto2Dmat subsetGrid parallelCheck selectPar.pplyFun getYearsAsINDEX getCoordinates aggregateGrid bindGrid
+#' @import transformeR
 #' @importFrom parallel stopCluster
 #' @importFrom magrittr %>% %<>% extract2
 #' @importFrom PCICt as.PCICt
@@ -104,10 +103,19 @@ climdexGrid <- function(index.code,
         message("NOTE: some input grids provided for ", index.code,
                 " index calculation are not required and were removed")
     }
-    # Ensure member is present in data structures
-    if (!is.null(tx)) tx %<>% redim(member = TRUE, var = FALSE)
-    if (!is.null(tn)) tn %<>% redim(member = TRUE, var = FALSE)
-    if (!is.null(pr)) pr %<>% redim(member = TRUE, var = FALSE)
+    # Ensure member is present in data structures / handle station <--> grid
+    if (!is.null(tx)) {
+        station <- ifelse(typeofGrid(tx) == "station", TRUE, FALSE)
+        tx %<>% redim(member = TRUE, var = FALSE)
+    }
+    if (!is.null(tn)) {
+        station <- ifelse(typeofGrid(tn) == "station", TRUE, FALSE)
+        tn %<>% redim(member = TRUE, var = FALSE)
+    }
+    if (!is.null(pr)) {
+        station <- ifelse(typeofGrid(pr) == "station", TRUE, FALSE)
+        pr %<>% redim(member = TRUE, var = FALSE)
+    }
     # Check structural consistency of data arrays when multiple
     if (index.code == "DTR" | index.code == "GSL") {
         sapply(list(tn, tx), "checkDim", dimensions = c("member", "time", "lat", "lon")) %>% invisible()
@@ -119,7 +127,11 @@ climdexGrid <- function(index.code,
     assign("refGrid", get(refGridName))
     # Number of members
     n.mem <- getShape(refGrid, "member")
-    coords <- expand.grid(refGrid$xyCoords$y, refGrid$xyCoords$x)[2:1]
+    coords <- if (station) {
+        getCoordinates(refGrid)
+    } else {
+        expand.grid(refGrid$xyCoords$y, refGrid$xyCoords$x)[2:1]
+    }
     # coercion to PCICt
     refDates <- getRefDates(refGrid) %>% as.PCICt(cal = cal)
     refDates.tx <- refDates.tn <- refDates.pr <- NULL
@@ -142,17 +154,17 @@ climdexGrid <- function(index.code,
         rm.ind.tx <- rm.ind.tn <- rm.ind.pr <- c()
         aux.tx <- aux.tn <- aux.pr <- NULL
         if (!is.null(tx)) {
-            tmp <- subsetGrid(tx, members = x, drop = TRUE)
+            tmp <- subsetGrid(tx, members = x, drop = TRUE) %>% redim(loc = FALSE, member = FALSE)
             aux.tx <- tmp[["Data"]] %>% array3Dto2Dmat()
             rm.ind.tx <- which(apply(aux.tx, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(tn)) {
-            tmp <- subsetGrid(tn, members = x, drop = TRUE)
+            tmp <- subsetGrid(tn, members = x, drop = TRUE) %>% redim(loc = FALSE, member = FALSE)
             aux.tn <- tmp[["Data"]] %>% array3Dto2Dmat()
             rm.ind.tn <- which(apply(aux.tn, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
         if (!is.null(pr)) {
-            tmp <- subsetGrid(pr, members = x, drop = TRUE)
+            tmp <- subsetGrid(pr, members = x, drop = TRUE) %>% redim(loc = FALSE, member = FALSE)
             aux.pr <- tmp[["Data"]] %>% array3Dto2Dmat()
             rm.ind.pr <- which(apply(aux.pr, MARGIN = 2, FUN = function(x) all(is.na(x))))
         }
@@ -191,7 +203,7 @@ climdexGrid <- function(index.code,
         tx <- tn <- pr <- NULL
         # Recover original matrix with masked points
         aux <- matrix(NA, nrow = nrow(out), ncol = nrow(coords))
-        aux[ ,setdiff(1:ncol(aux), rm.ind)] <- out
+        aux[ , setdiff(1:ncol(aux), rm.ind)] <- out
         out <- NULL
         # Transform to climate4R grid
         refGrid <- suppressMessages(aggregateGrid(tmp, aggr.m = list(FUN = "mean")))
@@ -201,7 +213,12 @@ climdexGrid <- function(index.code,
             refGrid <- suppressMessages(aggregateGrid(refGrid, aggr.y = list(FUN = "mean")))
             attr(refGrid[["Variable"]], "annual_agg_cellfun") <- metadata$indexfun
         }
-        refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
+        if (station) {
+            refGrid[["Data"]] <- aux
+            attr(refGrid[["Data"]], "dimensions") <- c("time", "loc")
+        } else {
+            refGrid[["Data"]] <- mat2Dto3Darray(aux, x = getCoordinates(refGrid)$x, y = getCoordinates(refGrid)$y)
+        }
         # Add attributes
         refGrid[["Variable"]][["varName"]] <- metadata$code
         attr(refGrid[["Variable"]], "longname") <- metadata$longname
@@ -212,11 +229,13 @@ climdexGrid <- function(index.code,
         return(refGrid)
     })
     message("[", Sys.time(), "] Done")
-    if (length(out.list) == 1) {
-        out.list %>% extract2(1) %>% redim(drop = TRUE) %>% invisible()
+    out <- if (length(out.list) == 1) {
+        out.list %>% extract2(1) %>% redim(drop = TRUE)
     } else {
-        do.call("bindGrid", c(out.list, dimension = "member")) %>% invisible()
+        do.call("bindGrid", c(out.list, dimension = "member"))
     }
+    if (station) out %<>% redim(drop = FALSE, loc = TRUE, member = FALSE)
+    invisible(out)
 }
 
 
