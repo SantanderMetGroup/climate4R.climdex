@@ -27,6 +27,6 @@
             packageStartupMessage(ver.mess)
         }
     }
-    packageStartupMessage("Use 'climdexShow()' for an overview of the available ETCDDI indices")
+    packageStartupMessage("Use 'climdexShow()' for an overview of the available ETCCDI indices")
 }
 # End

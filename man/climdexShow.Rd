@@ -21,7 +21,7 @@ for the argument \code{index.code} in \code{\link{climdexGrid}}
 Print a table with a summary of the 27 ETCCDI Core indices
 }
 \references{
-The ETCDDI web page giving the definition of the 27 core indices:
+The ETCCDI web page giving the definition of the 27 core indices:
 \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
 }
 \author{
