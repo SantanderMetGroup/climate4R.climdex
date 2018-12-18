@@ -15,29 +15,16 @@ The recommended procedure for installing the package is using the devtools packa
 devtools::install_github(c("SantanderMetGroup/transformeR", "SantanderMetGroup/climate4R.climdex"))
 ```
 
-**** 
-
-### To start...
+A list of all available indices and the atomic functions calculating them is printed on screen with:
 
 ```R
 library(climate4R.climdex)
-```
-
-An overview of the `climdex.pcic`package functionalities can be obtained using
-
-```R
-?climdex.pcic
-```
-
-A list of all available indices, the atomic functions calculating them, the input variables required... is printed on screen with:
-
-```R
 climdexShow()
+?climdexGrid   # see the examples 
 ```
 
-See the examples in: 
+Reference and further information: 
 
-```R
-?climdexGrid
-``` 
+**[General description of the climate4R framework]** Iturbide et al. (2019) The R-based climate4R open framework for reproducible climate data access and post-processing. **Environmental Modelling and Software**, 111, 42-54. https://doi.org/10.1016/j.envsoft.2018.09.009
+Check out the companion notebooks for the two examples [GitHub](https://github.com/SantanderMetGroup/notebooks).
 
