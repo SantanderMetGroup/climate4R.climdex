@@ -55,6 +55,25 @@
 #' fd.grid <- climdexGrid(tn = tasmin.eobs, index.code = "FD")
 #' spatialPlot(climatology(fd.grid), at = seq(0,165,10),
 #'             main = "Mean annual number of frost days (1991-2010)")
+#'
+#'
+#' # The following example will compute the CWD index
+#' # (maximum number of consecutive days with RR ≥ 1mm)
+#' # for the homogeneized VALUE dataset of stations over Europe
+#' # (See Gutiérrez et al. 2018 DOI:10.1002/joc.5462 for details on this dataset)
+#' library(loadeR)
+#' library(transformeR)
+#' library(visualizeR)
+#' destfile = "/tmp/VALUE_ECA_86_v2.tar.gz"
+#' # (~8Mb download, change destfile at your convenience)
+#' download.file("http://meteo.unican.es/work/loadeR/data/VALUE_ECA_86_v2.tar.gz", destfile = destfile)
+#' untar(destfile, exdir = "/tmp")
+#' station.data <- loadStationData(dataset = "/tmp/VALUE_ECA_86_v2",
+#'                                 var = "precip",
+#'                                 years = 1981:2000)
+#' cwd <- climdexGrid(index.code = "CWD", pr = station.data)
+#' spatialPlot(climatology(cwd), backdrop.theme = "countries",
+#'             main = "Mean number of consecutive annual wet days (1981-2000)")
 #' }
 #'
 #' @author J. Bedia
@@ -253,7 +272,7 @@ climdexGrid <- function(index.code,
 #' \item \strong{tn,tx,pr}: A logical value (0/1) indicating the input variables required for index calculation
 #' \item \strong{units}: The units of the index (when different from those of the input variable)
 #' }
-#' @references The ETCDDI web page giving the definition of the 27 core indices:
+#' @references The ETCCDI web page giving the definition of the 27 core indices:
 #' \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
 #' @author J. Bedia
 #' @export
