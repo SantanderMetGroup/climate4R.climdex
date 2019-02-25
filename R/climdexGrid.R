@@ -279,7 +279,7 @@ climdexGrid <- function(index.code,
 #' @importFrom magrittr %>%
 
 climdexShow <- function() {
-    read.master() %>% print()
+    read.master()
 }
 
 
