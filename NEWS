@@ -28,3 +28,6 @@
 ## v0.2.0 (18 Dec 2018)
 * Support for station data, with an example
 * Doc update and a few typos fixed
+
+## v0.2.1 (16 Apr 2019)
+* Minor change in the climdexShow display
