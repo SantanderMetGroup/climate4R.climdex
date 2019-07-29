@@ -106,7 +106,7 @@ climdexGrid <- function(index.code,
                                         "R20mm", "Rnnmm", "CDD", "CWD",
                                         "R95pTOT", "R99pTOT", "PRCPTOT"))
     aux <- read.master()
-    metadata <- aux[grep(index.code, aux$code, fixed = TRUE), ]
+    metadata <- aux[grep(paste0("^", index.code, "$"), aux$code, fixed = FALSE), ]
     a <- c(!is.null(tn), !is.null(tx), !is.null(pr)) %>% as.numeric()
     b <- metadata[ , 4:6] %>% as.numeric()
     if (any(b - a > 0)) {
