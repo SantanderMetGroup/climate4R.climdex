@@ -221,7 +221,9 @@ climdexGrid <- function(index.code,
         })
         tx <- tn <- pr <- NULL
         # Recover original matrix with masked points
-        aux <- matrix(NA, nrow = nrow(out), ncol = nrow(coords))
+        nr <- nrow(out)
+        if (is.null(nr)) nr <- 1
+        aux <- matrix(NA, nrow = nr, ncol = nrow(coords))
         aux[ , setdiff(1:ncol(aux), rm.ind)] <- out
         out <- NULL
         # Transform to climate4R grid
