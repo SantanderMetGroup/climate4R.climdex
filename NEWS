@@ -31,3 +31,6 @@
 
 ## v0.2.1 (16 Apr 2019)
 * Minor change in the climdexShow display
+
+## v0.2.2 (05 Jul 2021)
+* Minor bug fix in climdexGrid
