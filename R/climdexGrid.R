@@ -106,7 +106,7 @@ climdexGrid <- function(index.code,
                                         "R20mm", "Rnnmm", "CDD", "CWD",
                                         "R95pTOT", "R99pTOT", "PRCPTOT"))
     aux <- read.master()
-    metadata <- aux[grep(index.code, aux$code, fixed = TRUE), ]
+    metadata <- aux[grep(paste0("^", index.code, "$"), aux$code, fixed = FALSE), ]
     a <- c(!is.null(tn), !is.null(tx), !is.null(pr)) %>% as.numeric()
     b <- metadata[ , 4:6] %>% as.numeric()
     if (any(b - a > 0)) {
@@ -222,7 +222,7 @@ climdexGrid <- function(index.code,
         tx <- tn <- pr <- NULL
         # Recover original matrix with masked points
         nr <- nrow(out)
-        if(is.null(nr)) nr <- 1
+        if (is.null(nr)) nr <- 1
         aux <- matrix(NA, nrow = nr, ncol = nrow(coords))
         aux[ , setdiff(1:ncol(aux), rm.ind)] <- out
         out <- NULL
