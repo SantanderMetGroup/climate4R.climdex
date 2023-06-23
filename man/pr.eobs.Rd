@@ -4,7 +4,9 @@
 \name{pr.eobs}
 \alias{pr.eobs}
 \title{Daily accumulated precipitation gridded data for the Iberian Peninsula (1991-2010)}
-\format{A climate4R grid}
+\format{
+A climate4R grid
+}
 \description{
 Data from the EOBS dataset (v12), obtained via OPenDAP with \code{\link[loadeR]{loadGridData}}
 }

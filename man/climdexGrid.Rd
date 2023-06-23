@@ -4,9 +4,18 @@
 \alias{climdexGrid}
 \title{ETCCDI Climate Changes Indices in Climate4R}
 \usage{
-climdexGrid(index.code, tn = NULL, tx = NULL, pr = NULL,
-  input.arg.list = list(), index.arg.list = list(), cal = "365_day",
-  parallel = FALSE, max.ncores = 16, ncores = NULL)
+climdexGrid(
+  index.code,
+  tn = NULL,
+  tx = NULL,
+  pr = NULL,
+  input.arg.list = list(),
+  index.arg.list = list(),
+  cal = "365_day",
+  parallel = FALSE,
+  max.ncores = 16,
+  ncores = NULL
+)
 }
 \arguments{
 \item{index.code}{Character string, indicating the specific code of the index according to the ETCCDI
